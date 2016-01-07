@@ -1,0 +1,43 @@
+{
+  "name": "generator-lc-angular",
+  "version": "1.0.0",
+  "description": "Yeoman Generator for Enterprise Angular projects.",
+  "keywords": [
+    "yeoman-generator",
+    "angular",
+    "angular.js"
+  ],
+  "homepage": "https://github.com/Scoup/generator-lc-angular",
+  "bugs": "https://github.com/Scoup/generator-lc-angular/issues",
+  "author": {
+    "name": "Léo Haddad Carneiro",
+    "email": "scoup001@gmail.com",
+    "url": "https://github.com/Scoup"
+  },
+  "main": "app/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Scoup/generator-lc-angular.git"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "dependencies": {
+    "underscore": "~1.5",
+    "underscore.string": "~2.3",
+    "yeoman-generator": "~0.16",
+    "chalk": "~0.4.0",
+    "ng-parse-module": "~0.1.0"
+  },
+  "devDependencies": {
+    "mocha": "~1.10.0"
+  },
+  "engines": {
+    "node": ">=0.8.0"
+  },
+  "licenses": [
+    {
+      "type": "MIT"
+    }
+  ]
+}
