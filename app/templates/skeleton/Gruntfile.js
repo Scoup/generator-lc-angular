@@ -58,21 +58,18 @@ module.exports = function (grunt) {
                     middlewares.push(connect.directory(directory));
 
                     return middlewares;
-                },
-                m1iddleware: function(connect) {
-                    return [proxySnippet];
                 }
             },
-            proxies: [
-                {
-                    context: '/api',
-                    host: 'localhost',
-                    port: 3000,
-                    // rewrite: {
-                    //   '^/api': ''
-                    // }
-                }
-            ]
+            // Remove the proxies comments if you want to develop point to localhost point for your server
+            // Useful to develop with you localhost server without problem with cross-domain
+
+            // proxies: [
+            //     {
+            //         context: '/api',
+            //         host: 'localhost',
+            //         port: 3000,
+            //     }
+            // ]
         }
     };
 
@@ -238,7 +235,7 @@ module.exports = function (grunt) {
         }
     };
 
-    var imagemin = imagemin: {
+    var imagemin = {
         main:{
             files: [{
                 expand: true, cwd:'dist/',
