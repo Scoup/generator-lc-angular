@@ -90,10 +90,10 @@ Grunt Tasks
 
 Now that the project is created, you have 3 simple Grunt commands available:
 
-    grunt serve         #This will run a development server with watch & livereload enabled.
-    grunt test          #Run local unit tests.
-    grunt build         #Places a fully optimized (minified, concatenated, and more) in /dist
-    grunt test_debug    #Run local unit tests using mocha options
+    grunt serve    #This will run a development server with watch & livereload enabled.
+    grunt test     #Run local unit tests.
+    grunt build    #Places a fully optimized (minified, concatenated, and more) in /dist
+    grunt debug    #Keep unit tests running using karma
 
 When `grunt serve` is running, any changed javascript files will be linted using JSHint as well as have their appropriate unit tests executed.  Only the unit tests that correspond to the changed file will be run.  This allows for an efficient test driven workflow.
 
@@ -147,6 +147,7 @@ The project will include a ready-made Grunt build that will:
 * (Optionally) Minifies any images in `/img`.
 * Minifies the `index.html`.
 * Copies any extra files necessary for a distributable build (ex.  Font-Awesome font files, etc).
+* Have proxy option to connect your angular app with your local server without cross-domain problem. 
 
 The resulting build loads only a few highly compressed files.
 
