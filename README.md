@@ -2,9 +2,9 @@
 Generator for Angular.JS
 
 Project based on [generator-cg-angular](https://github.com/cgross/generator-cg-angular) that was abandoned.
-Great thanks [@cgross](https://github.com/cgross) and others contributors, you did a great job. Because aways having to customize the generator-cg-angular I started a fork.
+Great thanks [@cgross](https://github.com/cgross) and others contributors, you did a great job. Because I aways had to customize the generator-cg-angular I started a fork.
 
-This project is starting and not yet ready for production. I'm adding some of the pull requests of cg-angular in this project. All help are welcome.
+**This project is starting and not yet ready for production. I'm adding some of the pull requests of cg-angular in this project. All help are welcome.**
 
 >Yeoman Generator for Enterprise Angular Projects
 
