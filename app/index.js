@@ -95,6 +95,21 @@ CgangularGenerator.prototype.askForStrict = function askFor() {
     }.bind(this));
 };
 
+CgangularGenerator.prototype.askForBuildPath = function askFor() {
+    var cb = this.async();
+
+    var prompts = [{
+        name: 'buildPath',
+        message: 'Which path would you like to build your app? Can be changed later in Gruntfile.js',
+        default: 'dist'
+    }];
+
+    this.prompt(prompts, function (props) {
+        this.buildPath = props.buildPath;
+        cb();
+    }.bind(this));
+};
+
 CgangularGenerator.prototype.app = function app() {
     this.directory('skeleton/','./');
 };

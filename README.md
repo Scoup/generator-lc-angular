@@ -64,7 +64,7 @@ In this example, the user has chosen to group the app into an `admin` folder, a 
         my-service2.js ............. example service
         my-service2-spec.js ........ example service unit test
     /img ........................... images (not created by default but included in /dist if added)
-    /dist .......................... distributable version of app built using grunt and Gruntfile.js
+    /dist .......................... distributable version of app built using grunt and Gruntfile.js (can be changed)
     /bower_component................ 3rd party libraries managed by bower
     /node_modules .................. npm managed libraries used by grunt
 

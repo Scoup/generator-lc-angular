@@ -3,14 +3,17 @@
 
 var pkg = require('./package.json');
 
+// Path of build
+var buildPath = '<%= buildPath %>';
+
 //Using exclusion patterns slows down Grunt significantly
 //instead of creating a set of patterns like '**/*.js' and '!**/node_modules/**'
 //this method is used to create a set of inclusive patterns for all subdirectories
-//skipping node_modules, bower_components, dist, and any .dirs
+//skipping node_modules, bower_components, buildPath, and any .dirs
 //This enables users to create any directory structure they desire.
 var createFolderGlobs = function(fileTypePatterns) {
     fileTypePatterns = Array.isArray(fileTypePatterns) ? fileTypePatterns : [fileTypePatterns];
-    var ignore = ['node_modules','bower_components','dist','temp'];
+    var ignore = ['node_modules','bower_components',buildPath,'temp'];
     var fs = require('fs');
     return fs.readdirSync(process.cwd())
     .map(function(file){
@@ -96,7 +99,7 @@ module.exports = function (grunt) {
 
     var clean = {
         before:{
-            src:['dist','temp']
+            src:[buildPath,'temp']
         },
         after: {
             src:['temp']
@@ -127,15 +130,15 @@ module.exports = function (grunt) {
     var copy = {
         main: {
             files: [
-                {src: ['img/**'], dest: 'dist/'},
-                {src: ['bower_components/font-awesome/fonts/**'], dest: 'dist/',filter:'isFile',expand:true},
-                {src: ['bower_components/bootstrap/fonts/**'], dest: 'dist/',filter:'isFile',expand:true},
-                {src: ['index.html'], cwd: 'temp/', dest: 'dist/', expand: true},
-                {src: ['app.full.min.js'], cwd: 'temp/', dest: 'dist/', expand: true},
-                {src: ['app.full.min.css'], cwd: 'temp/', dest: 'dist/', expand: true},
-                //{src: ['bower_components/angular-ui-utils/ui-utils-ieshiv.min.js'], dest: 'dist/'},
+                {src: ['img/**'], dest: buildPath},
+                {src: ['bower_components/font-awesome/fonts/**'], dest: buildPath,filter:'isFile',expand:true},
+                {src: ['bower_components/bootstrap/fonts/**'], dest: buildPath,filter:'isFile',expand:true},
+                {src: ['index.html'], cwd: 'temp/', dest: buildPath, expand: true},
+                {src: ['app.full.min.js'], cwd: 'temp/', dest: buildPath, expand: true},
+                {src: ['app.full.min.css'], cwd: 'temp/', dest: buildPath, expand: true},
+                //{src: ['bower_components/angular-ui-utils/ui-utils-ieshiv.min.js'], dest: buildPath},
                 //{src: ['bower_components/select2/*.png','bower_components/select2/*.gif'], dest:'dist/css/',flatten:true,expand:true},
-                //{src: ['bower_components/angular-mocks/angular-mocks.js'], dest: 'dist/'}
+                //{src: ['bower_components/angular-mocks/angular-mocks.js'], dest: buildPath}
             ]
         }
     };
@@ -241,9 +244,9 @@ module.exports = function (grunt) {
     var imagemin = {
         main:{
             files: [{
-                expand: true, cwd:'dist/',
+                expand: true, cwd:buildPath,
                 src:['**/{*.png,*.jpg}'],
-                dest: 'dist/'
+                dest: buildPath
           }]
         }
     };
