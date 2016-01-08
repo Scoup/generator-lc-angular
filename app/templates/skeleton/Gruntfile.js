@@ -129,7 +129,10 @@ module.exports = function (grunt) {
             files: [
                 {src: ['img/**'], dest: 'dist/'},
                 {src: ['bower_components/font-awesome/fonts/**'], dest: 'dist/',filter:'isFile',expand:true},
-                {src: ['bower_components/bootstrap/fonts/**'], dest: 'dist/',filter:'isFile',expand:true}
+                {src: ['bower_components/bootstrap/fonts/**'], dest: 'dist/',filter:'isFile',expand:true},
+                {src: ['index.html'], cwd: 'temp/', dest: 'dist/', expand: true},
+                {src: ['app.full.min.js'], cwd: 'temp/', dest: 'dist/', expand: true},
+                {src: ['app.full.min.css'], cwd: 'temp/', dest: 'dist/', expand: true},
                 //{src: ['bower_components/angular-ui-utils/ui-utils-ieshiv.min.js'], dest: 'dist/'},
                 //{src: ['bower_components/select2/*.png','bower_components/select2/*.gif'], dest:'dist/css/',flatten:true,expand:true},
                 //{src: ['bower_components/angular-mocks/angular-mocks.js'], dest: 'dist/'}
@@ -151,19 +154,19 @@ module.exports = function (grunt) {
             options: {
                 remove: ['script[data-remove!="false"]','link[data-remove!="false"]'],
                 append: [
-                {selector:'body',html:'<script src="app.full.min.js"></script>'},
-                {selector:'head',html:'<link rel="stylesheet" href="app.full.min.css">'}
+                    {selector:'body',html:'<script src="app.full.min.js"></script>'},
+                    {selector:'head',html:'<link rel="stylesheet" href="app.full.min.css">'}
                 ]
             },
             src:'index.html',
-            dest: 'dist/index.html'
+            dest: 'temp/index.html'
         }
     };
 
     var cssmin = {
         main: {
             src:['temp/app.css','<%%= dom_munger.data.appcss %>'],
-            dest:'dist/app.full.min.css'
+            dest:'temp/app.full.min.css'
         }
     };
 
@@ -184,7 +187,7 @@ module.exports = function (grunt) {
     var uglify = {
         main: {
             src: 'temp/app.full.js',
-            dest:'dist/app.full.min.js'
+            dest:'temp/app.full.min.js'
         }
     };
 
@@ -200,7 +203,7 @@ module.exports = function (grunt) {
                 removeStyleLinkTypeAttributes: true
             },
             files: {
-                'dist/index.html': 'dist/index.html'
+                'temp/index.html': 'temp/index.html'
             }
         }
     };
@@ -268,7 +271,20 @@ module.exports = function (grunt) {
         karma: karma
     });
 
-    grunt.registerTask('build',['jshint','clean:before','less','dom_munger','ngtemplates','cssmin','concat','ngAnnotate','uglify','copy','htmlmin','clean:after']);
+    grunt.registerTask('build',[
+        'jshint',
+        'clean:before',
+        'less',
+        'dom_munger',
+        'ngtemplates',
+        'cssmin',
+        'concat',
+        'ngAnnotate',
+        'uglify',
+        'htmlmin',
+        'copy',
+        'clean:after'
+    ]);
     grunt.registerTask('serve', ['dom_munger:read','jshint','connect', 'watch']);
     grunt.registerTask('test',['dom_munger:read','karma:all_tests']);
     grunt.registerTask('debug',['dom_munger:read','karma:debug']);
