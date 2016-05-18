@@ -122,6 +122,16 @@ exports.getParentModule = function(dir){
     return exports.getParentModule(path.join(dir,'..'));
 };
 
+exports.getModules = function(that) {
+    var modules = that.config.get('modules') || [];
+    var mainModule = ngParseModule.parse('app.js');
+    mainModule.primary = true;
+
+    var choices = _.pluck(modules,'name');
+    choices.unshift(mainModule.name + ' (Primary Application Module)');
+    return choices;
+}
+
 exports.askForModule = function(type,that,cb){
 
     var modules = that.config.get('modules');
@@ -160,7 +170,6 @@ exports.askForModule = function(type,that,cb){
 
         cb.bind(that)(module);
     }.bind(that));
-
 };
 
 exports.askForDir = function(type,that,module,ownDir,cb){
