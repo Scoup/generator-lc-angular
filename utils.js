@@ -13,6 +13,23 @@ exports.LESS_MARKER = "/* Add Component LESS Above */";
 exports.ROUTE_MARKER = "/* Add New Routes Above */";
 exports.STATE_MARKER = "/* Add New States Above */";
 
+/**
+ * Return the Module Object
+ *
+ * that: Object - yeoman.Base
+ * module: String - Choosen module
+ * return Object - module
+ */
+exports.getModulePath = function(that, module) {
+    var modules     = that.config.get('modules');
+    var mainModule  = ngParseModule.parse('app.js');
+
+    var choices     = this.getModules(that);
+    var module      = choices.indexOf(module) === 0 ? mainModule : ngParseModule.parse(modules[i-1].file);
+
+    return module;
+}
+
 exports.addToFile = function(filename,lineToAdd,beforeMarker){
     try {
         var fullPath = path.resolve(process.cwd(),filename);

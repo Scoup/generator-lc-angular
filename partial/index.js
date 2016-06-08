@@ -35,7 +35,7 @@ module.exports = yeoman.Base.extend({
             this.name = answers.name;
             this.route = url.resolve('',answers.route);
             this.module = cgUtils.getModulePath(this, answers.module);
-            this.log(answers.name);
+            this.log(this.module);
         }.bind(this));
     },
 
