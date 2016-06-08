@@ -25,7 +25,8 @@ exports.getModulePath = function(that, module) {
     var mainModule  = ngParseModule.parse('app.js');
 
     var choices     = this.getModules(that);
-    var module      = choices.indexOf(module) === 0 ? mainModule : ngParseModule.parse(modules[i-1].file);
+    var position    = choices.indexOf(module);
+    var module      = position === 0 ? mainModule : ngParseModule.parse(modules[position-1].file);
 
     return module;
 }

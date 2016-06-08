@@ -1,43 +1,39 @@
 'use strict';
-var util = require('util');
-var yeoman = require('yeoman-generator');
-var path = require('path');
+var yeoman  = require('yeoman-generator');
 var cgUtils = require('../utils.js');
-var chalk = require('chalk');
-var _ = require('underscore');
-var fs = require('fs');
 
-_.str = require('underscore.string');
-_.mixin(_.str.exports());
+module.exports = yeoman.Base.extend({
+    constructor: function() {
+        yeoman.Base.apply(this, arguments);
+        this.type = 'service';
+    },
 
-var ServiceGenerator = module.exports = function ServiceGenerator(args, options, config) {
+    askForData: function() {
+        this.log('askForData');
+        var choices = cgUtils.getModules(this);
 
-    cgUtils.getNameArg(this,args);
+        return this.prompt([
+            {
+                type: 'input',
+                name: 'name',
+                message: 'Enter a name for service',
+                type: 'input'
+            },
+            {
+                name:'module',
+                message:'Which module would you like to place the new service?',
+                type: 'list',
+                choices: choices,
+                default: 0
+            }
+        ]).then(function (answers) {
+            this.name = answers.name;
+            this.module = cgUtils.getModulePath(this, answers.module);
+            this.log(this.module);
+        }.bind(this));
+    },
 
-    yeoman.generators.Base.apply(this, arguments);
-
-};
-
-util.inherits(ServiceGenerator, yeoman.generators.Base);
-
-ServiceGenerator.prototype.askFor = function askFor() {
-    var cb = this.async();
-
-    var prompts = [];
-
-    cgUtils.addNamePrompt(this,prompts,'service');
-
-    this.prompt(prompts, function (props) {
-        if (props.name){
-            this.name = props.name;
-        }
-        cgUtils.askForModuleAndDir('service',this,false,cb);
-    }.bind(this));     
-
-};
-
-ServiceGenerator.prototype.files = function files() {
-
-    cgUtils.processTemplates(this.name,this.dir,'service',this,null,null,this.module);
-
-};
+    generateFiles: function() {
+        // cgUtils.processTemplates(this.name,this.dir,'service',this,null,null,this.module);
+    }
+});

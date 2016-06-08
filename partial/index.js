@@ -1,16 +1,17 @@
 'use strict';
-var yeoman = require('yeoman-generator');
+var yeoman  = require('yeoman-generator');
 var cgUtils = require('../utils.js');
-var _ = require('underscore');
-var url = require('url');
+var _       = require('underscore');
+var url     = require('url');
 
 module.exports = yeoman.Base.extend({
     constructor: function() {
         yeoman.Base.apply(this, arguments);
+        this.type = 'partial';
     },
 
-    askForName: function() {
-        this.log('askForName');
+    askForData: function() {
+        this.log('askForData');
         var choices = cgUtils.getModules(this);
 
         return this.prompt([
