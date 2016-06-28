@@ -1,13 +1,67 @@
 'use strict';
-var util = require('util');
-var path = require('path');
-var yeoman = require('yeoman-generator');
+var yeoman  = require('yeoman-generator');
+var util    = require('util');
+var path    = require('path');
 var cgUtils = require('../utils.js');
 
-var CgangularGenerator = module.exports = function CgangularGenerator(args, options, config) {
-    yeoman.generators.Base.apply(this, arguments);
+module.exports = yeoman.Base.extend({
+    constructor: function() {
+        yeoman.Base.apply(this, arguments);
+    },
 
-    this.on('end', function () {
+    askForData: function() {
+        this.log('askForData');
+        return this.prompt([
+            {
+                name: 'appname',
+                message: 'What would you like the angular app/module name to be?',
+                default: path.basename(process.cwd())
+            },
+            {
+                name: 'router',
+                type:'list',
+                message: 'Which router would you like to use?',
+                default: 0,
+                choices: ['Standard Angular Router','Angular UI Router']
+            },
+            {
+                type: 'confirm',
+                name: 'jsstrict',
+                message: 'Would you like your AngularJS code to \'use strict\'?',
+                default: true
+            },
+            {
+                name: 'buildPath',
+                message: 'Which path would you like to build your app? Can be changed later in Gruntfile.js',
+                default: 'dist'
+            }
+        ]).then(function (answers) {
+            this.appname = answers.appname;
+
+            if (answers.router === 'Angular UI Router') {
+                this.uirouter = true;
+                this.routerJs = 'bower_components/angular-ui-router/release/angular-ui-router.js';
+                this.routerModuleName = 'ui.router';
+                this.routerViewDirective = 'ui-view';
+            } else {
+                this.uirouter = false;
+                this.routerJs = 'bower_components/angular-route/angular-route.js';
+                this.routerModuleName = 'ngRoute';
+                this.routerViewDirective = 'ng-view';
+            }
+
+            this.config.set('uirouter',this.uirouter);
+            this.config.set('jsstrict', !!answers.jsstrict);
+            this.buildPath = answers.buildPath;
+            this.directory('skeleton/','./');
+
+            // this.pkg = JSON.parse(this.readFileAsString(path.join(__dirname, '../package.json')));
+
+            this._end();
+        }.bind(this));
+    },
+
+    _end: function() {
         this.config.set('partialDirectory','partial/');
         this.config.set('modalDirectory','partial/');
         this.config.set('directiveDirectory','directive/');
@@ -29,87 +83,18 @@ var CgangularGenerator = module.exports = function CgangularGenerator(args, opti
         this.config.set('inject',inject);
         this.config.save();
         this.installDependencies({ skipInstall: options['skip-install'] });
-    });
+    },
 
-    this.pkg = JSON.parse(this.readFileAsString(path.join(__dirname, '../package.json')));
-};
+    generateFiles: function() {
+        // var configName = 'directiveSimpleTemplates';
+        // var defaultDir = 'templates/simple';
+        // if (this.needpartial) {
+        //     configName = 'directiveComplexTemplates';
+        //     defaultDir = 'templates/complex';
+        // }
 
-util.inherits(CgangularGenerator, yeoman.generators.Base);
+        // this.htmlPath = path.join(this.dir,this.name + '.html').replace(/\\/g,'/');;
 
-CgangularGenerator.prototype.askFor = function askFor() {
-    var cb = this.async();
-
-    var prompts = [{
-        name: 'appname',
-        message: 'What would you like the angular app/module name to be?',
-        default: path.basename(process.cwd())
-    }];
-
-    this.prompt(prompts, function (props) {
-        this.appname = props.appname;
-        cb();
-    }.bind(this));
-};
-
-CgangularGenerator.prototype.askForUiRouter = function askFor() {
-    var cb = this.async();
-
-    var prompts = [{
-        name: 'router',
-        type:'list',
-        message: 'Which router would you like to use?',
-        default: 0,
-        choices: ['Standard Angular Router','Angular UI Router']
-    }];
-
-    this.prompt(prompts, function (props) {
-        if (props.router === 'Angular UI Router') {
-            this.uirouter = true;
-            this.routerJs = 'bower_components/angular-ui-router/release/angular-ui-router.js';
-            this.routerModuleName = 'ui.router';
-            this.routerViewDirective = 'ui-view';
-        } else {
-            this.uirouter = false;
-            this.routerJs = 'bower_components/angular-route/angular-route.js';
-            this.routerModuleName = 'ngRoute';
-            this.routerViewDirective = 'ng-view';
-        }
-        this.config.set('uirouter',this.uirouter);
-        cb();
-    }.bind(this));
-};
-
-CgangularGenerator.prototype.askForStrict = function askFor() {
-    var cb = this.async();
-
-    var prompts = [{
-        type: 'confirm',
-        name: 'jsstrict',
-        message: 'Would you like your AngularJS code to \'use strict\'?',
-        default: true
-    }];
-
-    this.prompt(prompts, function (props) {
-        this.config.set('jsstrict', !!props.jsstrict);
-        cb();
-    }.bind(this));
-};
-
-CgangularGenerator.prototype.askForBuildPath = function askFor() {
-    var cb = this.async();
-
-    var prompts = [{
-        name: 'buildPath',
-        message: 'Which path would you like to build your app? Can be changed later in Gruntfile.js',
-        default: 'dist'
-    }];
-
-    this.prompt(prompts, function (props) {
-        this.buildPath = props.buildPath;
-        cb();
-    }.bind(this));
-};
-
-CgangularGenerator.prototype.app = function app() {
-    this.directory('skeleton/','./');
-};
+        // cgUtils.processTemplates(this.name,this.dir,'directive',this,defaultDir,configName,this.module);
+    }
+});

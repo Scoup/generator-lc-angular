@@ -47,6 +47,10 @@ exports.addToFile = function(filename,lineToAdd,beforeMarker){
     }
 };
 
+exports.processTemplates = function(name, path) {
+
+}
+
 exports.processTemplates = function(name,dir,type,that,defaultDir,configName,module){
 
     if (!defaultDir) {
@@ -140,6 +144,9 @@ exports.getParentModule = function(dir){
     return exports.getParentModule(path.join(dir,'..'));
 };
 
+/**
+ * Return the list of modules
+ */
 exports.getModules = function(that) {
     var modules = that.config.get('modules') || [];
     var mainModule = ngParseModule.parse('app.js');
