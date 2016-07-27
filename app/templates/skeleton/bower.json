@@ -1,5 +1,5 @@
 {
-  "name": "<%= _.slugify(appname) %>",
+  "name": "<%= appname %>",
   "version": "0.0.0",
   "main": "index.html",
   "ignore": [
@@ -12,7 +12,7 @@
     "underscore": "~1.5",
     "bootstrap": "~3.1",
     "angular": "~1.2",
-    <% if(uirouter) { print('"angular-ui-router": "~0.2",'); } else { print('"angular-route": "~1.2",'); } %>
+    "<%= uirouter ? 'angular-ui-router' : 'angular-route' %>": "<%= uirouter ? '~0.2' : '~1.2' %>",
     "angular-animate": "~1.2",
     "angular-resource": "~1.2",
     "angular-cookies": "~1.2",

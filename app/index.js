@@ -1,12 +1,34 @@
 'use strict';
 var yeoman  = require('yeoman-generator');
-var util    = require('util');
 var path    = require('path');
 var cgUtils = require('../utils.js');
+var _       = require('underscore');
+var glob    = require('glob');
 
 module.exports = yeoman.Base.extend({
-    constructor: function() {
+    constructor: function(args, options, config) {
         yeoman.Base.apply(this, arguments);
+
+        this.config.set('partialDirectory','partial/');
+        this.config.set('modalDirectory','partial/');
+        this.config.set('directiveDirectory','directive/');
+        this.config.set('filterDirectory','filter/');
+        this.config.set('serviceDirectory','service/');
+        var inject = {
+            js: {
+                file: 'index.html',
+                marker: cgUtils.JS_MARKER,
+                template: '<script src="<%= filename %>"></script>'
+            },
+            less: {
+                relativeToModule: true,
+                file: '<%= module %>.less',
+                marker: cgUtils.LESS_MARKER,
+                template: '@import "<%= filename %>";'
+            }
+        };
+        this.config.set('inject',inject);
+        this.config.save();
     },
 
     askForData: function() {
@@ -53,48 +75,36 @@ module.exports = yeoman.Base.extend({
             this.config.set('uirouter',this.uirouter);
             this.config.set('jsstrict', !!answers.jsstrict);
             this.buildPath = answers.buildPath;
-            this.directory('skeleton/','./');
-
-            // this.pkg = JSON.parse(this.readFileAsString(path.join(__dirname, '../package.json')));
-
-            this._end();
+            this._generateFiles();
         }.bind(this));
     },
 
-    _end: function() {
-        this.config.set('partialDirectory','partial/');
-        this.config.set('modalDirectory','partial/');
-        this.config.set('directiveDirectory','directive/');
-        this.config.set('filterDirectory','filter/');
-        this.config.set('serviceDirectory','service/');
-        var inject = {
-            js: {
-                file: 'index.html',
-                marker: cgUtils.JS_MARKER,
-                template: '<script src="<%= filename %>"></script>'
-            },
-            less: {
-                relativeToModule: true,
-                file: '<%= module %>.less',
-                marker: cgUtils.LESS_MARKER,
-                template: '@import "<%= filename %>";'
-            }
-        };
-        this.config.set('inject',inject);
-        this.config.save();
-        this.installDependencies({ skipInstall: options['skip-install'] });
+    _generateFiles: function() {
+        var root = this.templatePath('skeleton/');
+        var files = glob.sync('**', { dot: true, nodir: true, cwd: root });
+        for(var i in files) {
+            var appname = files[i] === 'bower.json' ? _.slugify(this.appname) : _.camelize(this.appname);
+            this.fs.copyTpl(
+                this.templatePath('skeleton/' + files[i]),
+                this.destinationPath(files[i]),
+                {
+                    appname: appname,
+                    routerModuleName: this.routerModuleName,
+                    uirouter: this.uirouter,
+                    jsstrict: this.jsstrict,
+                    buildPath: this.buildPath,
+                    routerJs: this.routerJs,
+                    routerViewDirective: this.routerViewDirective
+                }
+            );
+        }
+
+        this._install();
     },
 
-    generateFiles: function() {
-        // var configName = 'directiveSimpleTemplates';
-        // var defaultDir = 'templates/simple';
-        // if (this.needpartial) {
-        //     configName = 'directiveComplexTemplates';
-        //     defaultDir = 'templates/complex';
-        // }
-
-        // this.htmlPath = path.join(this.dir,this.name + '.html').replace(/\\/g,'/');;
-
-        // cgUtils.processTemplates(this.name,this.dir,'directive',this,defaultDir,configName,this.module);
+    _install: function() {
+        this.installDependencies({
+            skipInstall: this.options['skip-install']
+        });
     }
 });

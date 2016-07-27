@@ -1,13 +1,13 @@
-var path = require('path');
-var fs = require('fs');
-var _ = require('underscore');
-var chalk = require('chalk');
-_.str = require('underscore.string');
+var path            = require('path');
+var fs              = require('fs');
+var _               = require('underscore');
+var chalk           = require('chalk');
+_.str               = require('underscore.string');
+var ngParseModule   = require('ng-parse-module');
+
 _.mixin(_.str.exports());
-var ngParseModule = require('ng-parse-module');
 
-
-exports.JS_MARKER = "<!-- Add New Component JS Above -->";
+exports.JS_MARKER   = "<!-- Add New Component JS Above -->";
 exports.LESS_MARKER = "/* Add Component LESS Above */";
 
 exports.ROUTE_MARKER = "/* Add New Routes Above */";
@@ -16,9 +16,9 @@ exports.STATE_MARKER = "/* Add New States Above */";
 /**
  * Return the Module Object
  *
- * that: Object - yeoman.Base
- * module: String - Choosen module
- * return Object - module
+ * @param {Object} that - yeoman.Base
+ * @param {string} module - Choosen module
+ * @returns {Object} - module
  */
 exports.getModulePath = function(that, module) {
     var modules     = that.config.get('modules');
