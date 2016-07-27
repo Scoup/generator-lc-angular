@@ -99,7 +99,7 @@ module.exports = yeoman.Base.extend({
             );
         }
 
-        this._install();
+        // this._install();
     },
 
     _install: function() {

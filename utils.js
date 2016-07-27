@@ -20,15 +20,11 @@ exports.STATE_MARKER = "/* Add New States Above */";
  * @param {string} module - Choosen module
  * @returns {Object} - module
  */
-exports.getModulePath = function(that, module) {
-    var modules     = that.config.get('modules');
+exports.getModule = function(that, module) {
     var mainModule  = ngParseModule.parse('app.js');
+    module =  _.findWhere(that.config.get('modules'), {name: module})
 
-    var choices     = this.getModules(that);
-    var position    = choices.indexOf(module);
-    var module      = position === 0 ? mainModule : ngParseModule.parse(modules[position-1].file);
-
-    return module;
+    return module || mainModule;
 }
 
 exports.addToFile = function(filename,lineToAdd,beforeMarker){
@@ -47,8 +43,14 @@ exports.addToFile = function(filename,lineToAdd,beforeMarker){
     }
 };
 
-exports.processTemplates = function(name, path) {
+exports.addJs = function(filePath) {
+    var filename = 'index.html';
+    exports.addToFile(filename, '<script src="' + filePath + '"></script>', exports.JS_MARKER);
+}
 
+exports.addLess = function(filePath, module) {
+    var filename = module && module.folder ? module.folder + module.name + '.less' : 'app.less';
+    exports.addToFile(filename, '@import"' + filePath + '";', exports.LESS_MARKER);
 }
 
 exports.processTemplates = function(name,dir,type,that,defaultDir,configName,module){
@@ -121,29 +123,6 @@ exports.injectRoute = function(moduleFile,uirouter,name,route,routeUrl,that){
 
 };
 
-exports.getParentModule = function(dir){
-    //starting this dir, find the first module and return parsed results
-    if (fs.existsSync(dir)) {
-        var files = fs.readdirSync(dir);
-        for (var i = 0; i < files.length; i++) {
-            if (path.extname(files[i]) !== '.js') {
-                continue;
-            }
-            var results = ngParseModule.parse(path.join(dir,files[i]));
-            if (results) {
-                return results;
-            }
-        }
-    }
-
-    if (fs.existsSync(path.join(dir,'.yo-rc.json'))) {
-        //if we're in the root of the project then bail
-        return;
-    }
-
-    return exports.getParentModule(path.join(dir,'..'));
-};
-
 /**
  * Return the list of modules
  */
@@ -155,156 +134,4 @@ exports.getModules = function(that) {
     var choices = _.pluck(modules,'name');
     choices.unshift(mainModule.name + ' (Primary Application Module)');
     return choices;
-}
-
-exports.askForModule = function(type,that,cb){
-
-    var modules = that.config.get('modules');
-    var mainModule = ngParseModule.parse('app.js');
-    mainModule.primary = true;
-
-    if (!modules || modules.length === 0) {
-        cb.bind(that)(mainModule);
-        return;
-    }
-
-    var choices = _.pluck(modules,'name');
-    choices.unshift(mainModule.name + ' (Primary Application Module)');
-
-    var prompts = [
-        {
-            name:'module',
-            message:'Which module would you like to place the new ' + type + '?',
-            type: 'list',
-            choices: choices,
-            default: 0
-        }
-    ];
-
-    that.prompt(prompts, function (props) {
-
-        var i = choices.indexOf(props.module);
-
-        var module;
-
-        if (i === 0) {
-            module = mainModule;
-        } else {
-            module = ngParseModule.parse(modules[i-1].file);
-        }
-
-        cb.bind(that)(module);
-    }.bind(that));
-};
-
-exports.askForDir = function(type,that,module,ownDir,cb){
-
-    that.module = module;
-    that.appname = module.name;
-    that.dir = path.dirname(module.file);
-
-    var configedDir = that.config.get(type + 'Directory');
-    if (!configedDir){
-        configedDir = '.';
-    }
-    var defaultDir = path.join(that.dir,configedDir,'/');
-    defaultDir = path.relative(process.cwd(),defaultDir);
-
-    if (ownDir) {
-        defaultDir = path.join(defaultDir,that.name);
-    }
-
-    defaultDir = path.join(defaultDir,'/');
-
-    var dirPrompt = [
-        {
-            name:'dir',
-            message:'Where would you like to create the '+type+' files?',
-            default: defaultDir,
-            validate: function(dir){
-                if (!module.primary) {
-                    //ensure dir is in module dir or subdir of it
-                    dir = path.resolve(dir);
-                    if (path.relative(that.dir,dir).substring(0,2) === '..') {
-                        return 'Files must be placed inside the module directory or a subdirectory of the module.'
-                    }
-                }
-                return true;
-            }
-        }
-    ];
-
-    var dirPromptCallback = function (props) {
-
-        that.dir = path.join(props.dir,'/');
-        var dirToCreate = that.dir;
-        if (ownDir){
-            dirToCreate = path.join(dirToCreate, '..');
-        }
-
-        if (!fs.existsSync(dirToCreate)) {
-            that.prompt([{
-                name:'isConfirmed',
-                type:'confirm',
-                message:chalk.cyan(dirToCreate) + ' does not exist.  Create it?'
-            }],function(props){
-                if (props.isConfirmed){
-                    cb();
-                } else {
-                    that.prompt(dirPrompt,dirPromptCallback);
-                }
-            });
-        } else if (ownDir && fs.existsSync(that.dir)){
-            //if the dir exists and this type of thing generally is inside its own dir, confirm it
-            that.prompt([{
-                name:'isConfirmed',
-                type:'confirm',
-                message:chalk.cyan(that.dir) + ' already exists.  Components of this type contain multiple files and are typically put inside directories of their own.  Continue?'
-            }],function(props){
-                if (props.isConfirmed){
-                    cb();
-                } else {
-                    that.prompt(dirPrompt,dirPromptCallback);
-                }
-            });
-        } else {
-            cb();
-        }
-
-    };
-
-    that.prompt(dirPrompt,dirPromptCallback);
-
-};
-
-exports.askForModuleAndDir = function(type,that,ownDir,cb) {
-    exports.askForModule(type,that,function(module){
-        exports.askForDir(type,that,module,ownDir,cb);
-    });
-};
-
-exports.getNameArg = function(that,args){
-    if (args.length > 0){
-        that.name = args[0];
-    }
-};
-
-exports.addNamePrompt = function(that,prompts,type){
-    if (!that.name){
-        prompts.splice(0,0,{
-            name:'name',
-            message: 'Enter a name for the ' + type + '.',
-            validate: function(input) {
-                var valid = false;
-                switch (type) {
-                    case 'directive':  //https://github.com/angular/angular.js/commit/634e467172efa696eb32ef8942ffbedeecbd030e
-                        valid = (input === input.trim()) && (input[0].toLowerCase() === input[0]);
-                        break;
-                    default:
-                        valid = true; 
-                }
-                return valid;
-            }
-        });
-    }
 }
