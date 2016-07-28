@@ -1,16 +1,16 @@
 'use strict';
 var yeoman  = require('yeoman-generator');
-var cgUtils = require('../utils.js');
+var main    = require('../main.js');
 
-module.exports = yeoman.Base.extend({
+module.exports = Main.extend({
     constructor: function() {
         yeoman.Base.apply(this, arguments);
-        this.type = 'service';
+        this.type = 'filter';
     },
 
     askForData: function() {
         this.log('askForData');
-        var choices = cgUtils.getModules(this);
+        var choices = cgUtils.getModuleList();
 
         return this.prompt([
             {
@@ -28,7 +28,7 @@ module.exports = yeoman.Base.extend({
             }
         ]).then(function (answers) {
             this.name = answers.name;
-            this.module = cgUtils.getModule(this, answers.module);
+            this.module = cgUtils.getModule(answers.module);
             this.log(this.module);
         }.bind(this));
     },

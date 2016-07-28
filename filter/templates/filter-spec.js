@@ -1,10 +1,10 @@
-describe('<%= _.camelize(name) %>', function() {
+describe('<%= name %>', function() {
 
     beforeEach(module('<%= appname %>'));
 
     it('should ...', inject(function($filter) {
 
-        var filter = $filter('<%= _.camelize(name) %>');
+        var filter = $filter('<%= name %>');
 
         expect(filter('input')).toEqual('output');
 

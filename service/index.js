@@ -1,8 +1,8 @@
 'use strict';
 var yeoman  = require('yeoman-generator');
-var cgUtils = require('../utils.js');
+var Main    = require('../main.js');
 
-module.exports = yeoman.Base.extend({
+module.exports = Main.extend({
     constructor: function() {
         yeoman.Base.apply(this, arguments);
         this.type = 'service';
@@ -10,7 +10,7 @@ module.exports = yeoman.Base.extend({
 
     askForData: function() {
         this.log('askForData');
-        var choices = cgUtils.getModules(this);
+        var choices = this.getModuleList();
 
         return this.prompt([
             {
@@ -28,7 +28,7 @@ module.exports = yeoman.Base.extend({
             }
         ]).then(function (answers) {
             this.name = answers.name;
-            this.module = cgUtils.getModulePath(this, answers.module);
+            this.module = this.getModulePath(answers.module);
             this.log(this.module);
         }.bind(this));
     },

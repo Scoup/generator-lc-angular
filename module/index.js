@@ -2,13 +2,13 @@
 var util    = require('util');
 var yeoman  = require('yeoman-generator');
 var path    = require('path');
-var cgUtils = require('../utils.js');
 var _       = require('underscore');
 _.str       = require('underscore.string');
 var glob    = require('glob');
+var Main    = require('../main.js');
 _.mixin(_.str.exports());
 
-module.exports = yeoman.Base.extend({
+module.exports = Main.extend({
     constructor: function() {
         yeoman.Base.apply(this, arguments);
         this.type = 'module';
@@ -76,12 +76,12 @@ module.exports = yeoman.Base.extend({
         this.config.set('modules',modules);
         this.config.save();
 
-        cgUtils.addJs(jsPath);
+        this.addJs(jsPath);
 
         var clsName = _.slugify(this.name);
         var lessPath = clsName + '/' + clsName + '.less';
         var lineToAdd = '@import "{lessPath}";'.replace('{lessPath}', lessPath);
         var filename = 'app.less';
-        cgUtils.addToFile(filename, lineToAdd, cgUtils.LESS_MARKER);
+        this.addToFile(filename, lineToAdd, this.LESS_MARKER);
     }
 });

@@ -1,18 +1,19 @@
 'use strict';
 var yeoman  = require('yeoman-generator');
-var cgUtils = require('../utils.js');
 var glob    = require('glob');
 var _       = require('underscore');
 var path    = require('path');
+var Main    = require('../main.js');
 
-module.exports = yeoman.Base.extend({
+module.exports = Main.extend({
     constructor: function() {
         yeoman.Base.apply(this, arguments);
         this.type = 'directive';
     },
 
     askForData: function() {
-        var choices = cgUtils.getModules(this);
+        console.log(this.acd);
+        var choices = this.getModuleList();
 
         return this.prompt([
             {
@@ -41,7 +42,7 @@ module.exports = yeoman.Base.extend({
         ]).then(function (answers) {
             this.needpartial = answers.needpartial;
             this.name = answers.name;
-            this.module = cgUtils.getModule(this, answers.module);
+            this.module = this.getModule(answers.module);
             this.log(this.module);
             this._generateFiles();
         }.bind(this));
@@ -96,7 +97,7 @@ module.exports = yeoman.Base.extend({
 
     _addJs: function() {
         var filename = this._getTemplatePath('js');
-        cgUtils.addJs(filename);
+        this.addJs(filename);
     },
 
     _updateLess: function() {
@@ -113,7 +114,7 @@ module.exports = yeoman.Base.extend({
             path = 'directive/' + name + '/' + name + '.less';
         }
         var lineToAdd = '@import "{path}";'.replace('{path}', path);
-        cgUtils.addToFile(filename, lineToAdd, cgUtils.LESS_MARKER);
+        this.addToFile(filename, lineToAdd, cgUtils.LESS_MARKER);
     }
 
 });

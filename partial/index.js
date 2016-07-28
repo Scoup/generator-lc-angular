@@ -1,22 +1,21 @@
 'use strict';
 var yeoman  = require('yeoman-generator');
-var cgUtils = require('../utils.js');
 var _       = require('underscore');
 var url     = require('url');
 var glob    = require('glob');
 var path    = require('path');
 var chalk   = require('chalk');
+var Main    = require('../main.js');
 var beautify = require('js-beautify').js_beautify;
 
-module.exports = yeoman.Base.extend({
+module.exports = Main.extend({
     constructor: function() {
         yeoman.Base.apply(this, arguments);
         this.type = 'partial';
     },
 
     askForData: function() {
-        this.log('askForData');
-        var choices = cgUtils.getModules(this);
+        var choices = this.getModuleList();
 
         return this.prompt([
             {
@@ -39,8 +38,7 @@ module.exports = yeoman.Base.extend({
         ]).then(function (answers) {
             this.name = answers.name;
             this.route = url.resolve('',answers.route);
-            this.module = cgUtils.getModule(this, answers.module);
-            this.log(this.module);
+            this.module = this.getModule(answers.module);
             this._generateFiles();
         }.bind(this));
     },
@@ -91,13 +89,13 @@ module.exports = yeoman.Base.extend({
         var code, marker;
         if (this.config.get('uirouter')){
             code = this._getUiRoute();
-            marker = cgUtils.STATE_MARKER;
+            marker = this.STATE_MARKER;
         } else {
             code = this._getAngularRoute();
-            marker = cgUtils.ROUTE_MARKER;
+            marker = this.ROUTE_MARKER;
         }
 
-        cgUtils.addToFile(this.module.file, code, marker);
+        this.addToFile(this.module.file, code, marker);
         this.log.writeln(chalk.green(' updating') + ' %s',path.basename(this.module.file));
     },
 
@@ -119,7 +117,7 @@ module.exports = yeoman.Base.extend({
 
     _addJs: function() {
         var filename = this._getTemplatePath('js');
-        cgUtils.addJs(filename);
+        this.addJs(filename);
     },
 
     _updateLess: function() {
@@ -136,6 +134,6 @@ module.exports = yeoman.Base.extend({
             path = 'partial/' + name + '/' + name + '.less';
         }
         var lineToAdd = '@import "{path}";'.replace('{path}', path);
-        cgUtils.addToFile(filename, lineToAdd, cgUtils.LESS_MARKER);
+        this.addToFile(filename, lineToAdd, this.LESS_MARKER);
     }
 });
