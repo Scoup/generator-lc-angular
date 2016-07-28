@@ -1,10 +1,9 @@
 'use strict';
 var yeoman  = require('yeoman-generator');
 var path    = require('path');
+var cgUtils = require('../utils.js');
 var _       = require('underscore');
 var glob    = require('glob');
-_.str       = require('underscore.string');
-_.mixin(_.str.exports());
 
 module.exports = yeoman.Base.extend({
     constructor: function(args, options, config) {
@@ -61,6 +60,7 @@ module.exports = yeoman.Base.extend({
 
             this.config.set('uirouter',this.uirouter);
             this.config.set('jsstrict', !!answers.jsstrict);
+            this.config.set('appName', this.appName);
             this.buildPath = answers.buildPath;
             this._generateFiles();
         }.bind(this));

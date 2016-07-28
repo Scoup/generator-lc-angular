@@ -46,7 +46,7 @@ module.exports = Main.extend({
     _generateFiles: function() {
         var fromFolder = './';
         var extra = {
-            appname: this.config.get('appname'),
+            appname: this.getModuleName(),
             ctrlname: this.getCtrlName(),
             clsname: this.getClsName(),
             uirouter: this.config.get('uirouter'),

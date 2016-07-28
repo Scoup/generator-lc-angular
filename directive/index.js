@@ -53,7 +53,7 @@ module.exports = Main.extend({
         }
 
         var extra = {
-            appname: this.config.get('appname'),
+            appname: this.getModuleName(),
             name: this.name,
             clsName: this.getClsName(),
             htmlPath: this.getTemplatePath('html'),

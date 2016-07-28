@@ -36,7 +36,7 @@ module.exports = Main.extend({
     _generateFiles: function() {
         var fromFolder = './';
         var extra = {
-            appname: this.config.get('appname'),
+            appname: this.getModuleName(),
             name: this.getCamelName(),
             jsstrict: this.config.get('jsstrict')
         };

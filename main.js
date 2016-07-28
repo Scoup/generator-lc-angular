@@ -122,6 +122,14 @@ module.exports = yeoman.Base.extend({
         return _.camelize(this.name);
     },
 
+    getModuleName: function() {
+        if(this.module.folder === '') {
+            return _.slugify(this.config.get('appName'));
+        } else {
+            return _.slugify(this.module.folder);
+        }
+    }
+
     /**
      * Update the less file with the new file
      * Add "@import my_file.less" in the less file. If is in a module, insert in a module.less,
