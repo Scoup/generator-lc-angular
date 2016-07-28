@@ -28,7 +28,7 @@ module.exports = Main.extend({
             }
         ]).then(function (answers) {
             this.name = answers.name;
-            this.module = this.getModulePath(answers.module);
+            this.module = this.getModule(answers.module);
             this._generateFiles();
         }.bind(this));
     },
@@ -37,9 +37,7 @@ module.exports = Main.extend({
         var fromFolder = './';
         var extra = {
             appname: this.config.get('appname'),
-            ctrlname: this.getCtrlName(),
-            clsname: this.getClsName(),
-            uirouter: this.config.get('uirouter'),
+            name: this.getCamelName(),
             jsstrict: this.config.get('jsstrict')
         };
         this.generateFiles(fromFolder, extra, true);

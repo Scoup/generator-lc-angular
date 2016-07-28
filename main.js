@@ -58,7 +58,7 @@ module.exports = yeoman.Base.extend({
      * @param {string} beforeMarkar - A point to where to content will be inserted
      */
     addToFile: function(filename,lineToAdd,beforeMarker){
-        this.log(chalk.green(' updating') + ' %s',filename);
+        this.log.writeln(chalk.green(' updating') + ' %s',filename);
         try {
             var fullPath = path.resolve(process.cwd(),filename);
             var fileSrc = fs.readFileSync(fullPath,'utf8');
@@ -85,19 +85,45 @@ module.exports = yeoman.Base.extend({
     },
 
     getCtrlName: function() {
-        return _.camelize(this.name + '-ctrl');
+        return this.getCamelName() + '-ctrl';
     },
 
     getClsName: function() {
         return _.dasherize(this.name);
     },
 
-    getTemplatePath: function(extension) {
-        var extension = '.' + extension || '.html';
-        var name = _.slugify(this.name);
-        return path.join(this.module.folder, this.type, name + extension);
+    getSlugName: function() {
+        return _.slugify(this.name);
     },
 
+    getCamelName: function() {
+        return _.camelize(this.name);
+    },
+
+    updateLess: function() {
+        var name = this.getClsName();
+        var extension = '.less';
+        var filePath = path.join(this.type, name, name + extension);
+
+        var filename;
+        if(this.module.folder === '') {
+            // main
+            filename = 'app.less';
+        } else {
+            // module
+            var moduleName = _.slugify(this.module.name);
+            filename = this.module.folder + moduleName + '.less';
+        }
+        
+        var lineToAdd = '@import "{filePath}";'.replace('{filePath}', filePath);
+        this.addToFile(filename, lineToAdd, this.LESS_MARKER);
+    },
+
+    getTemplatePath: function(extension) {
+        var extension = '.' + extension || '.html';
+        var name = this.getSlugName();
+        return path.join(this.module.folder, this.type, name + extension);
+    },
 
     generateFiles: function(fromFolder, extra, replaceName) {
         replaceName = replaceName || false;
@@ -120,12 +146,11 @@ module.exports = yeoman.Base.extend({
             );
         }
     },
-    // this.destinationPath(this.dir + _.slugify(this.name) + ext),
 
     getDestinationPath: function(filename) {
         if(this.type !== 'module') {
             var modulePath = this.module.folder;
-            return path.join(modulePath, this.type, _.slugify(this.name), filename);
+            return path.join(modulePath, this.type, this.getSlugName(), filename);
         } else {
             return path.join(this.getClsName(), filename);
         }

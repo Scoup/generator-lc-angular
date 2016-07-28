@@ -2,9 +2,9 @@ describe('<%= name %>', function() {
 
     beforeEach(module('<%= appname %>'));
 
-    it('should ...', inject(function(<%= _.camelize(name) %>) {
+    it('should ...', inject(function(<%= name %>) {
 
-        //expect(<%= _.camelize(name) %>.doSomething()).toEqual('something');
+        //expect(<%= name %>.doSomething()).toEqual('something');
 
     }));
 });

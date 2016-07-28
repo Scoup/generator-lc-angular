@@ -41,7 +41,6 @@ module.exports = Main.extend({
             this.needpartial = answers.needpartial;
             this.name = answers.name;
             this.module = this.getModule(answers.module);
-            this.log(this.module);
             this._generateFiles();
         }.bind(this));
     },
@@ -66,25 +65,7 @@ module.exports = Main.extend({
 
         this.addJs(this.getTemplatePath('js'));
         if(this.needpartial) {
-            this._updateLess();
+            this.updateLess();
         }
-    },
-
-    _updateLess: function() {
-        var filename, path;
-        var name = this.getClsName();
-        if(this.module.folder === '') {
-            // main
-            filename = 'app.less';
-            path = 'directive/' + name + '/' + name + '.less';
-        } else {
-            // module
-            var moduleName = _.slugify(this.module.name);
-            filename = this.module.folder + moduleName + '.less';
-            path = 'directive/' + name + '/' + name + '.less';
-        }
-        var lineToAdd = '@import "{path}";'.replace('{path}', path);
-        this.addToFile(filename, lineToAdd, this.LESS_MARKER);
     }
-
 });

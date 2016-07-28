@@ -56,7 +56,7 @@ module.exports = Main.extend({
         this.generateFiles(fromFolder, extra, true);
         this.addJs(this.getTemplatePath('js'));
         this._generateRoute();
-        this._updateLess();
+        this.updateLess();
     },
 
     _generateRoute: function() {
@@ -87,22 +87,5 @@ module.exports = Main.extend({
         var ctrlName = this.getCtrlName();
         var output = "$stateProvider.state('"+name+"', { url: '"+route+"', templateUrl: '"+templatePath+"', controller: '"+ctrlName+"'});";
         return beautify(output, {indent_size: 4});
-    },
-
-    _updateLess: function() {
-        var filename, path;
-        var name = this.getClsName();
-        if(this.module.folder === '') {
-            // main
-            filename = 'app.less';
-            path = 'partial/' + name + '/' + name + '.less';
-        } else {
-            // module
-            var moduleName = _.slugify(this.module.name);
-            filename = this.module.folder + moduleName + '.less';
-            path = 'partial/' + name + '/' + name + '.less';
-        }
-        var lineToAdd = '@import "{path}";'.replace('{path}', path);
-        this.addToFile(filename, lineToAdd, this.LESS_MARKER);
     }
 });

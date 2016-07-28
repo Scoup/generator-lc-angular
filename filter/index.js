@@ -1,6 +1,6 @@
 'use strict';
 var yeoman  = require('yeoman-generator');
-var main    = require('../main.js');
+var Main    = require('../main.js');
 
 module.exports = Main.extend({
     constructor: function() {
@@ -10,7 +10,7 @@ module.exports = Main.extend({
 
     askForData: function() {
         this.log('askForData');
-        var choices = cgUtils.getModuleList();
+        var choices = this.getModuleList();
 
         return this.prompt([
             {
@@ -28,7 +28,7 @@ module.exports = Main.extend({
             }
         ]).then(function (answers) {
             this.name = answers.name;
-            this.module = cgUtils.getModule(answers.module);
+            this.module = this.getModule(answers.module);
             this._generateFiles();
         }.bind(this));
     },
@@ -37,9 +37,7 @@ module.exports = Main.extend({
         var fromFolder = './';
         var extra = {
             appname: this.config.get('appname'),
-            ctrlname: this.getCtrlName(),
-            clsname: this.getClsName(),
-            uirouter: this.config.get('uirouter'),
+            name: this.getCamelName(),
             jsstrict: this.config.get('jsstrict')
         };
         this.generateFiles(fromFolder, extra, true);
