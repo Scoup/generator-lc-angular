@@ -10,7 +10,6 @@ module.exports = Main.extend({
     },
 
     askForData: function() {
-        console.log(this.acd);
         var choices = this.getModuleList();
 
         return this.prompt([

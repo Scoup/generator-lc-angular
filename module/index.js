@@ -73,12 +73,7 @@ module.exports = Main.extend({
         this.config.save();
 
         this.addJs(jsPath);
-
-        var clsName = this.getSlugName();
-        var lessPath = clsName + '/' + clsName + '.less';
-        var lineToAdd = '@import "{lessPath}";'.replace('{lessPath}', lessPath);
-        var filename = 'app.less';
-        this.addToFile(filename, lineToAdd, this.LESS_MARKER);
+        this.updateLess();
     },
 
     /**

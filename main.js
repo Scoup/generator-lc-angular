@@ -128,18 +128,23 @@ module.exports = yeoman.Base.extend({
      * if is not, add in app.less
      */
     updateLess: function() {
-        var name = this.getClsName();
+        var name = this.getSlugName();
         var extension = '.less';
-        var filePath = path.join(this.type, name, name + extension);
+        var filename, filePath;
 
-        var filename;
-        if(this.module.folder === '') {
-            // main
+        if(this.type === 'module') {
+            filePath = path.join(name, name + extension);
             filename = 'app.less';
         } else {
-            // module
-            var moduleName = _.slugify(this.module.name);
-            filename = this.module.folder + moduleName + '.less';
+            filePath = path.join(this.type, name, name + extension);
+            if(this.module.folder === '') {
+                // main
+                filename = 'app.less';
+            } else {
+                // module
+                var moduleName = _.slugify(this.module.name);
+                filename = this.module.folder + moduleName + '.less';
+            }
         }
         
         var lineToAdd = '@import "{filePath}";'.replace('{filePath}', filePath);
