@@ -81,6 +81,7 @@ module.exports = yeoman.Base.extend({
      */
     addJs: function(filePath) {
         var filename = 'index.html';
+        filePath = filePath || this.getTemplatePath('js');
         this.addToFile(filename, '<script src="' + filePath + '"></script>', this.JS_MARKER);
     },
 

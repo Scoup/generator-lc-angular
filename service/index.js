@@ -41,6 +41,6 @@ module.exports = Main.extend({
             jsstrict: this.config.get('jsstrict')
         };
         this.generateFiles(fromFolder, extra, true);
-        this.addJs(this.getTemplatePath('js'));
+        this.addJs();
     }
 });

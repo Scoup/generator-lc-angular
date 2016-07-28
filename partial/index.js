@@ -54,7 +54,7 @@ module.exports = Main.extend({
         };
 
         this.generateFiles(fromFolder, extra, true);
-        this.addJs(this.getTemplatePath('js'));
+        this.addJs();
         this._generateRoute();
         this.updateLess();
     },

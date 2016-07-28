@@ -63,7 +63,7 @@ module.exports = Main.extend({
 
         this.generateFiles(fromFolder, extra, true);
 
-        this.addJs(this.getTemplatePath('js'));
+        this.addJs();
         if(this.needpartial) {
             this.updateLess();
         }
