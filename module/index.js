@@ -1,11 +1,14 @@
 'use strict';
-var util    = require('util');
-var yeoman  = require('yeoman-generator');
-var path    = require('path');
-var _       = require('underscore');
-_.str       = require('underscore.string');
-var glob    = require('glob');
-var Main    = require('../main.js');
+var util            = require('util');
+var yeoman          = require('yeoman-generator');
+var path            = require('path');
+var _               = require('underscore');
+_.str               = require('underscore.string');
+var glob            = require('glob');
+var chalk           = require('chalk');
+var Main            = require('../main.js');
+var ngParseModule   = require('ng-parse-module');
+
 _.mixin(_.str.exports());
 
 module.exports = Main.extend({
@@ -54,14 +57,15 @@ module.exports = Main.extend({
         };
 
         this.generateFiles(fromFolder, extra, true);
+        this._configData();
         this._registerModule();
     },
 
-    _registerModule: function() {
+    _configData: function() {
         var modules = this.config.get('modules') || [];
         var jsPath = path.join(this.dir, this.name + '.js');
         modules.push({
-            name: _.camelize(this.name),
+            name: this.getCamelName(),
             file: jsPath,
             folder: this.dir
         });
@@ -70,10 +74,24 @@ module.exports = Main.extend({
 
         this.addJs(jsPath);
 
-        var clsName = _.slugify(this.name);
+        var clsName = this.getSlugName();
         var lessPath = clsName + '/' + clsName + '.less';
         var lineToAdd = '@import "{lessPath}";'.replace('{lessPath}', lessPath);
         var filename = 'app.less';
         this.addToFile(filename, lineToAdd, this.LESS_MARKER);
+    },
+
+    /**
+     * Register this module in app.js
+     */
+    _registerModule: function() {
+        var dir = '/';
+        var file = 'app.js';
+        var filePath = path.join(file);
+        var module = ngParseModule.parse(filePath);
+
+        module.dependencies.modules.push(this.getCamelName());
+        module.save();
+        this.log.writeln(chalk.green(' updating') + ' %s',path.basename(file));
     }
 });
