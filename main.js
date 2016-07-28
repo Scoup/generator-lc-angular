@@ -85,22 +85,48 @@ module.exports = yeoman.Base.extend({
         this.addToFile(filename, '<script src="' + filePath + '"></script>', this.JS_MARKER);
     },
 
+    /**
+     * Return the name of the Controller
+     *
+     * @returns {string} - NameOfCtrl
+     */
     getCtrlName: function() {
         return this.getCamelName() + '-ctrl';
     },
 
+    /**
+     * Return the name of css class
+     * 
+     * @alias getSlugName
+     * @returns {string} - name-of-ctrl
+     */
     getClsName: function() {
-        return _.dasherize(this.name);
+        return this.getSlugName();
     },
 
+    /**
+     * Return the name of the Controller in slug mode
+     *
+     * @returns {string} - name-of-ctrl
+     */
     getSlugName: function() {
         return _.slugify(this.name);
     },
 
+    /**
+     * Return the name in CamelMode
+     *
+     * @returns {string} - nameOfCtrl
+     */
     getCamelName: function() {
         return _.camelize(this.name);
     },
 
+    /**
+     * Update the less file with the new file
+     * Add "@import my_file.less" in the less file. If is in a module, insert in a module.less,
+     * if is not, add in app.less
+     */
     updateLess: function() {
         var name = this.getClsName();
         var extension = '.less';
@@ -120,12 +146,25 @@ module.exports = yeoman.Base.extend({
         this.addToFile(filename, lineToAdd, this.LESS_MARKER);
     },
 
+    /**
+     * Return the path of the file you need to add, like my_partial.js or my_partial.less
+     *
+     * @param {string} [extension=html] - The extension of the file you want (html, less, js)
+     * @returns {string} - The path of the file
+     */
     getTemplatePath: function(extension) {
         var extension = '.' + extension || '.html';
         var name = this.getSlugName();
         return path.join(this.module.folder, this.type, name + extension);
     },
 
+    /**
+     * Copy the files and apply the template conversion
+     *
+     * @param {string} fromFolder - The relative path of the command called
+     * @param {Object} extra - Extra data to be sent to the template
+     * @param {boolean} [replaceName=false] - If true, replace the name of the file with the name of the call
+     */
     generateFiles: function(fromFolder, extra, replaceName) {
         replaceName = replaceName || false;
 
@@ -148,6 +187,13 @@ module.exports = yeoman.Base.extend({
         }
     },
 
+    /**
+     * Return the full destination of a filename to where need to be copied
+     * Check if has module or not to decide the path
+     *
+     * @param {string} filename - The name of file you want the full destination
+     * @returns {string} - Full path to destination
+     */
     getDestinationPath: function(filename) {
         if(this.type !== 'module') {
             var modulePath = this.module.folder;
