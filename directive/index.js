@@ -1,13 +1,11 @@
 'use strict';
-var yeoman  = require('yeoman-generator');
-var glob    = require('glob');
 var _       = require('underscore');
 var path    = require('path');
 var Main    = require('../main.js');
 
 module.exports = Main.extend({
     constructor: function() {
-        yeoman.Base.apply(this, arguments);
+        Main.apply(this, arguments);
         this.type = 'directive';
     },
 
@@ -50,59 +48,31 @@ module.exports = Main.extend({
 
     _generateFiles: function() {
         var configName = 'directiveSimpleTemplates';
-        var defaultDir = './simple';
+        var fromFolder = './simple';
         if (this.needpartial) {
             configName = 'directiveComplexTemplates';
-            defaultDir = './complex';
+            fromFolder = './complex';
         }
 
-        var root = this.templatePath(defaultDir);
-        var files = glob.sync('**', { dot: true, nodir: true, cwd: root });
-
-        var modulePath = this.module.folder;
-        for(var i in files) {
-            console.log("file", files[i])
-            var file = files[i];
-            var appname = _.camelize(this.appname);
-            var filename = file.indexOf('-spec') < 0 ? this._getClsName() + path.extname(file) : this._getClsName() + '-spec' + path.extname(file);
-            var destinationPath = path.join(modulePath, 'directive', _.slugify(this.name), filename);
-
-            this.fs.copyTpl(
-                this.templatePath(defaultDir + '/' + files[i]),
-                this.destinationPath(destinationPath),
-                {
-                    appname: this.config.get('appname'),
-                    name: this.name,
-                    clsName: this._getClsName(),
-                    htmlPath: this._getTemplatePath('html'),
-                    jsstrict: this.config.get('jsstrict'),
-                }
-            );
+        var extra = {
+            appname: this.config.get('appname'),
+            name: this.name,
+            clsName: this.getClsName(),
+            htmlPath: this.getTemplatePath('html'),
+            jsstrict: this.config.get('jsstrict'),
         }
-        this._addJs();
+
+        this.generateFiles(fromFolder, extra, true);
+
+        this.addJs(this.getTemplatePath('js'));
         if(this.needpartial) {
-            this._updateLess();    
+            this._updateLess();
         }
-    },
-
-    _getTemplatePath: function(extension) {
-        var extension = '.' + extension || '.html';
-        var name = _.slugify(this.name);
-        return this.module.folder + 'directive/' + name + '/' + name + extension;
-    },
-
-    _getClsName: function() {
-        return _.dasherize(this.name);
-    },
-
-    _addJs: function() {
-        var filename = this._getTemplatePath('js');
-        this.addJs(filename);
     },
 
     _updateLess: function() {
         var filename, path;
-        var name = this._getClsName();
+        var name = this.getClsName();
         if(this.module.folder === '') {
             // main
             filename = 'app.less';
@@ -114,7 +84,7 @@ module.exports = Main.extend({
             path = 'directive/' + name + '/' + name + '.less';
         }
         var lineToAdd = '@import "{path}";'.replace('{path}', path);
-        this.addToFile(filename, lineToAdd, cgUtils.LESS_MARKER);
+        this.addToFile(filename, lineToAdd, this.LESS_MARKER);
     }
 
 });

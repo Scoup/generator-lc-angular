@@ -29,11 +29,20 @@ module.exports = Main.extend({
         ]).then(function (answers) {
             this.name = answers.name;
             this.module = this.getModulePath(answers.module);
-            this.log(this.module);
+            this._generateFiles();
         }.bind(this));
     },
 
-    generateFiles: function() {
-        // cgUtils.processTemplates(this.name,this.dir,'service',this,null,null,this.module);
+    _generateFiles: function() {
+        var fromFolder = './';
+        var extra = {
+            appname: this.config.get('appname'),
+            ctrlname: this.getCtrlName(),
+            clsname: this.getClsName(),
+            uirouter: this.config.get('uirouter'),
+            jsstrict: this.config.get('jsstrict')
+        };
+        this.generateFiles(fromFolder, extra, true);
+        this.addJs(this.getTemplatePath('js'));
     }
 });

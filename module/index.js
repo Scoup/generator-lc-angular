@@ -45,23 +45,15 @@ module.exports = Main.extend({
     },
 
     _generateFiles: function() {
-        var root = this.templatePath('./');
-        var files = glob.sync('**', { dot: true, nodir: true, cwd: root });
-        for(var i in files) {
-            var appname = _.camelize(this.appname);
-            var ext = path.extname(files[i]);
-            this.fs.copyTpl(
-                this.templatePath('./' + files[i]),
-                this.destinationPath(this.dir + _.slugify(this.name) + ext),
-                {
-                    name: _.camelize(this.name),
-                    uirouter: this.config.get('uirouter'),
-                    routerModuleName: this.config.get('uirouter') ? 'ui.router' : 'ngRoute',
-                    jsstrict: this.config.get('jsstrict')
-                }
-            );
-        }
+        var fromFolder = './';
+        var extra = {
+            name: _.camelize(this.name),
+            uirouter: this.config.get('uirouter'),
+            routerModuleName: this.config.get('uirouter') ? 'ui.router' : 'ngRoute',
+            jsstrict: this.config.get('jsstrict')
+        };
 
+        this.generateFiles(fromFolder, extra, true);
         this._registerModule();
     },
 

@@ -44,45 +44,19 @@ module.exports = Main.extend({
     },
 
     _generateFiles: function() {
-        var root = this.templatePath('./');
-        var files = glob.sync('**', { dot: true, nodir: true, cwd: root });
+        var fromFolder = './';
+        var extra = {
+            appname: this.config.get('appname'),
+            ctrlname: this.getCtrlName(),
+            clsname: this.getClsName(),
+            uirouter: this.config.get('uirouter'),
+            jsstrict: this.config.get('jsstrict')
+        };
 
-        var modulePath = this.module.folder;
-        for(var i in files) {
-            var appname = _.camelize(this.appname);
-            var file = files[i];
-            var filename = file.indexOf('-spec') < 0 ? this._getClsName() + path.extname(file) : this._getClsName() + '-spec' + path.extname(file);
-            var destinationPath = path.join(modulePath, 'partial', _.slugify(this.name), filename);
-
-            this.fs.copyTpl(
-                this.templatePath('./' + files[i]),
-                this.destinationPath(destinationPath),
-                {
-                    appname: this.config.get('appname'),
-                    ctrlname: this._getCtrlName(),
-                    clsname: this._getClsName(),
-                    uirouter: this.config.get('uirouter'),
-                    jsstrict: this.config.get('jsstrict')
-                }
-            );
-        }
+        this.generateFiles(fromFolder, extra, true);
+        this.addJs(this.getTemplatePath('js'));
         this._generateRoute();
-        this._addJs();
         this._updateLess();
-    },
-
-    _getCtrlName: function() {
-        return _.camelize(this.name + '-ctrl');
-    },
-
-    _getClsName: function() {
-        return _.dasherize(this.name);
-    },
-
-    _getTemplatePath: function(extension) {
-        var extension = '.' + extension || '.html';
-        var name = _.slugify(this.name);
-        return this.module.folder + 'partial/' + name + '/' + name + extension;
     },
 
     _generateRoute: function() {
@@ -101,28 +75,23 @@ module.exports = Main.extend({
 
     _getAngularRoute: function(route, templatePath) {
         var route = this.route;
-        var templatePath = this._getTemplatePath('html');
+        var templatePath = this.getTemplatePath('html');
         var output = '$routeProvider.when(\''+route+'\',{templateUrl: \''+templatePath+'\'});';
         return beautify(output, {indent_size: 4});
     },
 
     _getUiRoute: function(){
-        var name = this._getClsName(); 
+        var name = this.getClsName(); 
         var route = this.route;
-        var templatePath = this._getTemplatePath('html');
-        var ctrlName = this._getCtrlName();
+        var templatePath = this.getTemplatePath('html');
+        var ctrlName = this.getCtrlName();
         var output = "$stateProvider.state('"+name+"', { url: '"+route+"', templateUrl: '"+templatePath+"', controller: '"+ctrlName+"'});";
         return beautify(output, {indent_size: 4});
     },
 
-    _addJs: function() {
-        var filename = this._getTemplatePath('js');
-        this.addJs(filename);
-    },
-
     _updateLess: function() {
         var filename, path;
-        var name = this._getClsName();
+        var name = this.getClsName();
         if(this.module.folder === '') {
             // main
             filename = 'app.less';
