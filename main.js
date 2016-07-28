@@ -88,10 +88,10 @@ module.exports = yeoman.Base.extend({
     /**
      * Return the name of the Controller
      *
-     * @returns {string} - NameOfCtrl
+     * @returns {string} - nameOfCtrl
      */
     getCtrlName: function() {
-        return this.getCamelName() + '-ctrl';
+        return _.camelize(this.name + '-ctrl');
     },
 
     /**

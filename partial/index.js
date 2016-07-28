@@ -70,7 +70,6 @@ module.exports = Main.extend({
         }
 
         this.addToFile(this.module.file, code, marker);
-        this.log.writeln(chalk.green(' updating') + ' %s',path.basename(this.module.file));
     },
 
     _getAngularRoute: function(route, templatePath) {
