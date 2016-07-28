@@ -160,7 +160,11 @@ module.exports = yeoman.Base.extend({
     getTemplatePath: function(extension) {
         var extension = '.' + extension || '.html';
         var name = this.getSlugName();
-        return path.join(this.module.folder, this.type, name + extension);
+        if(this.type === 'module') {
+            return path.join(this.module.folder, this.type, name + extension);    
+        } else {
+            return path.join(this.module.folder, this.type, name, name + extension);
+        }
     },
 
     /**
