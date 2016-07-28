@@ -52,7 +52,9 @@ module.exports = yeoman.Base.extend({
         var modulePath = this.module.folder;
         for(var i in files) {
             var appname = _.camelize(this.appname);
-            var destinationPath = path.join(modulePath, _.slugify(this.name), files[i]);
+            var file = files[i];
+            var filename = file.indexOf('-spec') < 0 ? this._getClsName() + path.extname(file) : this._getClsName() + '-spec' + path.extname(file);
+            var destinationPath = path.join(modulePath, 'partial', _.slugify(this.name), filename);
 
             this.fs.copyTpl(
                 this.templatePath('./' + files[i]),

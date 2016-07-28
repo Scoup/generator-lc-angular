@@ -1,6 +1,9 @@
 'use strict';
 var yeoman  = require('yeoman-generator');
 var cgUtils = require('../utils.js');
+var glob    = require('glob');
+var _       = require('underscore');
+var path    = require('path');
 
 module.exports = yeoman.Base.extend({
     constructor: function() {
@@ -38,21 +41,79 @@ module.exports = yeoman.Base.extend({
         ]).then(function (answers) {
             this.needpartial = answers.needpartial;
             this.name = answers.name;
-            this.module = cgUtils.getModulePath(this, answers.module);
+            this.module = cgUtils.getModule(this, answers.module);
             this.log(this.module);
+            this._generateFiles();
         }.bind(this));
     },
 
-    generateFiles: function() {
+    _generateFiles: function() {
         var configName = 'directiveSimpleTemplates';
-        var defaultDir = 'templates/simple';
+        var defaultDir = './simple';
         if (this.needpartial) {
             configName = 'directiveComplexTemplates';
-            defaultDir = 'templates/complex';
+            defaultDir = './complex';
         }
 
-        this.htmlPath = path.join(this.dir,this.name + '.html').replace(/\\/g,'/');;
+        var root = this.templatePath(defaultDir);
+        var files = glob.sync('**', { dot: true, nodir: true, cwd: root });
 
-        // cgUtils.processTemplates(this.name,this.dir,'directive',this,defaultDir,configName,this.module);
+        var modulePath = this.module.folder;
+        for(var i in files) {
+            console.log("file", files[i])
+            var file = files[i];
+            var appname = _.camelize(this.appname);
+            var filename = file.indexOf('-spec') < 0 ? this._getClsName() + path.extname(file) : this._getClsName() + '-spec' + path.extname(file);
+            var destinationPath = path.join(modulePath, 'directive', _.slugify(this.name), filename);
+
+            this.fs.copyTpl(
+                this.templatePath(defaultDir + '/' + files[i]),
+                this.destinationPath(destinationPath),
+                {
+                    appname: this.config.get('appname'),
+                    name: this.name,
+                    clsName: this._getClsName(),
+                    htmlPath: this._getTemplatePath('html'),
+                    jsstrict: this.config.get('jsstrict'),
+                }
+            );
+        }
+        this._addJs();
+        if(this.needpartial) {
+            this._updateLess();    
+        }
+    },
+
+    _getTemplatePath: function(extension) {
+        var extension = '.' + extension || '.html';
+        var name = _.slugify(this.name);
+        return this.module.folder + 'directive/' + name + '/' + name + extension;
+    },
+
+    _getClsName: function() {
+        return _.dasherize(this.name);
+    },
+
+    _addJs: function() {
+        var filename = this._getTemplatePath('js');
+        cgUtils.addJs(filename);
+    },
+
+    _updateLess: function() {
+        var filename, path;
+        var name = this._getClsName();
+        if(this.module.folder === '') {
+            // main
+            filename = 'app.less';
+            path = 'directive/' + name + '/' + name + '.less';
+        } else {
+            // module
+            var moduleName = _.slugify(this.module.name);
+            filename = this.module.folder + moduleName + '.less';
+            path = 'directive/' + name + '/' + name + '.less';
+        }
+        var lineToAdd = '@import "{path}";'.replace('{path}', path);
+        cgUtils.addToFile(filename, lineToAdd, cgUtils.LESS_MARKER);
     }
+
 });
