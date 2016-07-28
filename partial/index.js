@@ -80,7 +80,7 @@ module.exports = yeoman.Base.extend({
     },
 
     _getTemplatePath: function(extension) {
-        var extension = extension || '.html';
+        var extension = '.' + extension || '.html';
         var name = _.slugify(this.name);
         return this.module.folder + 'partial/' + name + '/' + name + extension;
     },
@@ -121,7 +121,19 @@ module.exports = yeoman.Base.extend({
     },
 
     _updateLess: function() {
-        var filename = this._getTemplatePath('less');
-        cgUtils.addLess(this.module, filename);
-    },
+        var filename, path;
+        var name = this._getClsName();
+        if(this.module.folder === '') {
+            // main
+            filename = 'app.less';
+            path = 'partial/' + name + '/' + name + '.less';
+        } else {
+            // module
+            var moduleName = _.slugify(this.module.name);
+            filename = this.module.folder + moduleName + '.less';
+            path = 'partial/' + name + '/' + name + '.less';
+        }
+        var lineToAdd = '@import "{path}";'.replace('{path}', path);
+        cgUtils.addToFile(filename, lineToAdd, cgUtils.LESS_MARKER);
+    }
 });

@@ -40,7 +40,6 @@ module.exports = yeoman.Base.extend({
         ]).then(function (answers) {
             this.name = answers.name;
             this.dir = answers.dir;
-            this.log(this.module);
             this._generateFiles();
         }.bind(this));
     },
@@ -64,7 +63,6 @@ module.exports = yeoman.Base.extend({
         }
 
         this._registerModule();
-        cgUtils.addJs(jsPath);
     },
 
     _registerModule: function() {
@@ -77,5 +75,13 @@ module.exports = yeoman.Base.extend({
         });
         this.config.set('modules',modules);
         this.config.save();
+
+        cgUtils.addJs(jsPath);
+
+        var clsName = _.slugify(this.name);
+        var lessPath = clsName + '/' + clsName + '.less';
+        var lineToAdd = '@import "{lessPath}";'.replace('{lessPath}', lessPath);
+        var filename = 'app.less';
+        cgUtils.addToFile(filename, lineToAdd, cgUtils.LESS_MARKER);
     }
 });

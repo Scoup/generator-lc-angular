@@ -22,12 +22,14 @@ exports.STATE_MARKER = "/* Add New States Above */";
  */
 exports.getModule = function(that, module) {
     var mainModule  = ngParseModule.parse('app.js');
+    mainModule.folder = '';
     module =  _.findWhere(that.config.get('modules'), {name: module})
 
     return module || mainModule;
 }
 
 exports.addToFile = function(filename,lineToAdd,beforeMarker){
+    console.log(chalk.green(' updating') + ' %s',filename);
     try {
         var fullPath = path.resolve(process.cwd(),filename);
         var fileSrc = fs.readFileSync(fullPath,'utf8');
@@ -46,11 +48,6 @@ exports.addToFile = function(filename,lineToAdd,beforeMarker){
 exports.addJs = function(filePath) {
     var filename = 'index.html';
     exports.addToFile(filename, '<script src="' + filePath + '"></script>', exports.JS_MARKER);
-}
-
-exports.addLess = function(filePath, module) {
-    var filename = module && module.folder ? module.folder + module.name + '.less' : 'app.less';
-    exports.addToFile(filename, '@import"' + filePath + '";', exports.LESS_MARKER);
 }
 
 exports.processTemplates = function(name,dir,type,that,defaultDir,configName,module){
