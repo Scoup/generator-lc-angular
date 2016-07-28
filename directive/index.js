@@ -1,58 +1,70 @@
 'use strict';
-var util = require('util');
-var yeoman = require('yeoman-generator');
-var path = require('path');
-var cgUtils = require('../utils.js');
-var chalk = require('chalk');
-var _ = require('underscore');
-var fs = require('fs');
+var _       = require('underscore');
+var path    = require('path');
+var Main    = require('../main.js');
 
-_.str = require('underscore.string');
-_.mixin(_.str.exports());
+module.exports = Main.extend({
+    constructor: function() {
+        Main.apply(this, arguments);
+        this.type = 'directive';
+    },
 
-var DirectiveGenerator = module.exports = function DirectiveGenerator(args, options, config) {
+    askForData: function() {
+        var choices = this.getModuleList();
 
-    cgUtils.getNameArg(this,args);
+        return this.prompt([
+            {
+                type:'confirm',
+                name: 'needpartial',
+                message: 'Does this directive need an external html file (i.e. partial)?',
+                default: true
+            },
+            {
+                type: 'input',
+                name: 'name',
+                message: 'Enter a name for directive',
+                type: 'input',
+                validate: function(input) {
+                    //https://github.com/angular/angular.js/commit/634e467172efa696eb32ef8942ffbedeecbd030e
+                    return (input === input.trim()) && (input[0].toLowerCase() === input[0]);
+                }
+            },
+            {
+                name:'module',
+                message:'Which module would you like to place the new directive?',
+                type: 'list',
+                choices: choices,
+                default: 0
+            }
+        ]).then(function (answers) {
+            this.needpartial = answers.needpartial;
+            this.name = answers.name;
+            this.module = this.getModule(answers.module);
+            this._generateFiles();
+        }.bind(this));
+    },
 
-    yeoman.generators.Base.apply(this, arguments);
-
-};
-
-util.inherits(DirectiveGenerator, yeoman.generators.Base);
-
-DirectiveGenerator.prototype.askFor = function askFor() {
-    var cb = this.async();
-
-    var prompts = [{
-        type:'confirm',
-        name: 'needpartial',
-        message: 'Does this directive need an external html file (i.e. partial)?',
-        default: true
-    }];
-
-    cgUtils.addNamePrompt(this,prompts,'directive');
-
-    this.prompt(prompts, function (props) {
-        if (props.name){
-            this.name = props.name;
+    _generateFiles: function() {
+        var configName = 'directiveSimpleTemplates';
+        var fromFolder = './simple';
+        if (this.needpartial) {
+            configName = 'directiveComplexTemplates';
+            fromFolder = './complex';
         }
-        this.needpartial = props.needpartial;
-        cgUtils.askForModuleAndDir('directive',this,this.needpartial,cb);
-    }.bind(this));
 
-};
+        var extra = {
+            appname: this.config.get('appname'),
+            name: this.name,
+            clsName: this.getClsName(),
+            htmlPath: this.getTemplatePath('html'),
+            jsstrict: this.config.get('jsstrict'),
+        }
 
-DirectiveGenerator.prototype.files = function files() {
+        this.generateFiles(fromFolder, extra, true);
 
-    var configName = 'directiveSimpleTemplates';
-    var defaultDir = 'templates/simple';
-    if (this.needpartial) {
-        configName = 'directiveComplexTemplates';
-        defaultDir = 'templates/complex';
+        this.addJs();
+        if(this.needpartial) {
+            this.updateLess();
+        }
     }
-
-    this.htmlPath = path.join(this.dir,this.name + '.html').replace(/\\/g,'/');;
-
-    cgUtils.processTemplates(this.name,this.dir,'directive',this,defaultDir,configName,this.module);
-
-};
+});

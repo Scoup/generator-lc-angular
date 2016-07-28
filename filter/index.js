@@ -1,44 +1,46 @@
 'use strict';
-var util = require('util');
-var yeoman = require('yeoman-generator');
-var path = require('path');
-var cgUtils = require('../utils.js');
-var chalk = require('chalk');
-var _ = require('underscore');
-var fs = require('fs');
+var yeoman  = require('yeoman-generator');
+var Main    = require('../main.js');
 
-_.str = require('underscore.string');
-_.mixin(_.str.exports());
+module.exports = Main.extend({
+    constructor: function() {
+        yeoman.Base.apply(this, arguments);
+        this.type = 'filter';
+    },
 
-var FilterGenerator = module.exports = function FilterGenerator(args, options, config) {
+    askForData: function() {
+        this.log('askForData');
+        var choices = this.getModuleList();
 
-    cgUtils.getNameArg(this,args);
+        return this.prompt([
+            {
+                type: 'input',
+                name: 'name',
+                message: 'Enter a name for filter',
+                type: 'input'
+            },
+            {
+                name:'module',
+                message:'Which module would you like to place the new filter?',
+                type: 'list',
+                choices: choices,
+                default: 0
+            }
+        ]).then(function (answers) {
+            this.name = answers.name;
+            this.module = this.getModule(answers.module);
+            this._generateFiles();
+        }.bind(this));
+    },
 
-    yeoman.generators.Base.apply(this, arguments);
-
-};
-
-util.inherits(FilterGenerator, yeoman.generators.Base);
-
-FilterGenerator.prototype.askFor = function askFor() {
-    var cb = this.async();
-
-    var prompts = [];
-
-    cgUtils.addNamePrompt(this,prompts,'filter');
-
-    this.prompt(prompts, function (props) {
-        if (props.name){
-            this.name = props.name;
-        }
-        cgUtils.askForModuleAndDir('filter',this,false,cb);
-    }.bind(this));    
-
-    
-};
-
-FilterGenerator.prototype.files = function files() {
-
-    cgUtils.processTemplates(this.name,this.dir,'filter',this,null,null,this.module);
-
-};
+    _generateFiles: function() {
+        var fromFolder = './';
+        var extra = {
+            appname: this.config.get('appname'),
+            name: this.getCamelName(),
+            jsstrict: this.config.get('jsstrict')
+        };
+        this.generateFiles(fromFolder, extra, true);
+        this.addJs();
+    }
+});

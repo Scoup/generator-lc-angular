@@ -1,6 +1,6 @@
-angular.module('<%= appname %>').factory('<%= _.camelize(name) %>',function() {
-    <%= config.get('jsstrict') ? "'use strict';\n" : "" %>
-    var <%= _.camelize(name) %> = {};
+angular.module('<%= appname %>').factory('<%= name %>',function() {
+    <%- jsstrict ? "'use strict';\n" : "" %>
+    var <%= name %> = {};
 
-    return <%= _.camelize(name) %>;
+    return <%= name %>;
 });
