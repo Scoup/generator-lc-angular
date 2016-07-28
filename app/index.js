@@ -1,9 +1,10 @@
 'use strict';
 var yeoman  = require('yeoman-generator');
 var path    = require('path');
-var cgUtils = require('../utils.js');
 var _       = require('underscore');
 var glob    = require('glob');
+_.str       = require('underscore.string');
+_.mixin(_.str.exports());
 
 module.exports = yeoman.Base.extend({
     constructor: function(args, options, config) {
@@ -14,20 +15,6 @@ module.exports = yeoman.Base.extend({
         this.config.set('directiveDirectory','directive/');
         this.config.set('filterDirectory','filter/');
         this.config.set('serviceDirectory','service/');
-        var inject = {
-            js: {
-                file: 'index.html',
-                marker: cgUtils.JS_MARKER,
-                template: '<script src="<%= filename %>"></script>'
-            },
-            less: {
-                relativeToModule: true,
-                file: '<%= module %>.less',
-                marker: cgUtils.LESS_MARKER,
-                template: '@import "<%= filename %>";'
-            }
-        };
-        this.config.set('inject',inject);
         this.config.save();
     },
 
