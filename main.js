@@ -128,7 +128,7 @@ module.exports = yeoman.Base.extend({
         } else {
             return _.slugify(this.module.folder);
         }
-    }
+    },
 
     /**
      * Update the less file with the new file
